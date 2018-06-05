@@ -1,0 +1,8 @@
+
+with open('./data/subset_log.csv') as f:
+
+    first_line = f.readline()
+    print("first_ilne\t", first_line)
+
+    for line in f:
+        print("next line\t", line)
