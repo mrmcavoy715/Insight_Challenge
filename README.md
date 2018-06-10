@@ -9,7 +9,7 @@
 - Log file is 3.7GB in size
 - Format is a comma-delimited file, where each line is a request. Parameters of interest are: ip, and the date and time
 
-## Methods - Detailed description of functions in sessionization.py
+## Methods - Detailed description of stepsf in sessionization.py
 
 Specifics of the code are available as comments in the main program - sessionization.py. The objective is to count the number of requests for a user, defined as a session.
 
@@ -19,9 +19,9 @@ For extensibility, an object termed `logs` in the program is instantiated for th
 
 The main function of `logs` is called.
 
-The file is formatted so that the second line contains the earliest date in the file. Collecting this and formatting it as a datetime is done. Then the file is rewound back so the first request can be manipulated in the same way as other requests.
+The log file is formatted so that the second line contains the earliest date in the file. Collecting this and formatting it as a datetime is done. Then the log file is rewound back so the first request can be manipulated in the same way as other requests.
 
-Each request is a line in the file. For each request, the parameters of interest are collected. Due to format of the file, any ip that is equal to "ip" indicates a header row and should be skipped. The parameters of interest are: ip date, and time. 
+Each request is a line in the log file. For each request, the parameters of interest are collected. Due to format of the file, any ip that is equal to "ip" indicates a header row and should be skipped.
 
 The time of the request is formatted as a datetime object by concatting the date and time of the request.
 
@@ -29,13 +29,13 @@ Python dictionaries allow O(1) lookup times. It was determined this structure al
 
 As inactivity period is measured in seconds, it made sense to reduce the number of checks to once a second. This is done by knowing when a requests time is different than the previous request. Additionally, by checking for difference, the code can handle the unlikely event of a longer interval between requests. At this time, the function `to_output` is called followed by updating the previous time.
 
-`to_output` is written to check if a session's inactivity period has elapsed. It has optional parameters that allows for a check to occur both while reading over the file, and at the end of the file. The only way to know if a session has ended is to check all ongoing sessions and check their times. If the difference between the current time and a session's end time is greater than the inactivity period, or if it's the end of the log file, then the session has ended. If it's the end of the session, then this is written as the end time for the session. Then the session period is calculated as the difference between end time and start time. The count was already calculated in the main loop. Finally, this session is added to an array for deletion (python discourages deletion from a dictionary that is being looped over).
+`to_output` is written to check if a session's inactivity period has elapsed. It has optional parameters that allows for a check to occur both while reading over the file, and at the end of the file. The only way to know if a session has ended is to loop over all ongoing sessions and check their times. If the difference between the current time and a session's end time is greater than the inactivity period, or if it's the end of the log file, then the session has ended. If it's the end of the session, then this is written as the end time for the session. Next, the session period is calculated as the difference between end time and start time. The count was already calculated in the main loop. Finally, all completed sessions are added to an array for deletion (python discourages deletion from a dictionary that is being looped over).
 
-As a requirement is to preserve order, the deletion array is sorted by start time and index (where index is line number in the log file). This allows users that have the same start time to be written to output in the same order they came in.
+As a requirement is to preserve order, the deletion array is sorted by start time and index (where index is line number in the log file). This allows requests that have the same start time to be written to output in the same order they came in.
 
-Once the array has been sorted, the output file is written in the desired format. The session is deleted from the dictionary.
+Once the array has been sorted, the output file is written in the desired format. The completed sessions are deleted from the dictionary.
 
-Finally, once everything is complete, the input and output files are closed.
+Once everything is complete, the input and output files are closed.
 
 ## Results and future directions
 
